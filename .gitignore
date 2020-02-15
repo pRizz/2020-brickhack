@@ -10,3 +10,10 @@ pom.xml.asc
 **/*~
 .idea
 .cpcache
+
+profiles.clj
+/out
+/.repl
+*.log
+/.env
+/.sass-cache
