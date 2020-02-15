@@ -75,16 +75,33 @@
 ;; -------------------------
 ;; Page mounting component
 
+(defn- toolbar-element []
+  [:div {:style {:position         "absolute"
+                 :top              20
+                 :right            20
+                 :padding          20
+                 :color            "#ddd"
+                 :background-color "black"
+                 :borderRadius     8}}
+   "testing"])
+
+(defn- sketch-element []
+  [:div#sketch {:style {:position         "absolute"
+                        :top              0
+                        :bottom           0
+                        :left             0
+                        :right            0
+                        :background-color "black"}}])
+
 (defn current-page []
-  (let [sketch-instance (js/setTimeout #(ribbons/sketch {:canvas-id "sketch"}) 500)]) ; TODO: find a cleaner way to wait for sketch div to render
+  (let [seed 1234
+        sketch-instance (js/setTimeout #(ribbons/sketch {:canvas-id "sketch"
+                                                         :seed      seed})
+                                       500)])               ; TODO: find a cleaner way to wait for sketch div to render
   (fn []
-    [:div {:style {:position         "absolute"
-                   :top              0
-                   :bottom           0
-                   :left             0
-                   :right            0
-                   :background-color "black"}}
-     [:div#sketch]]))
+    [:<>
+     [sketch-element]
+     [toolbar-element]]))
 
 ;; -------------------------
 ;; Initialize app
@@ -109,4 +126,5 @@
      (fn [path]
        (boolean (reitit/match-by-path router path)))})
   (accountant/dispatch-current!)
-  (mount-root))
+  (mount-root)
+  (aset (-> js/document .-documentElement .-style) "backgroundColor" "black"))

@@ -6,12 +6,16 @@
 (def window-width (.-innerWidth js/window))
 (def window-height (.-innerHeight js/window))
 
+(defn nth-mod [coll n]
+  (nth coll (mod n (count coll))))
+
 ; This-sketch custom code
-(def palette (rand-nth c/palettes))
+
+(def palette-atm (atom nil))
 
 (defn trail
   [id]
-  (c/particle-trail id (q/random window-width) (q/random window-height) (rand-nth (:colors palette))))
+  (c/particle-trail id (q/random window-width) (q/random window-height) (rand-nth (:colors @palette-atm))))
 
 ; settings constants
 (def noise-zoom 0.002)
@@ -43,7 +47,7 @@
   ; Set color mode to HSB (HSV) instead of default RGB
   (q/color-mode :hsb 360 100 100 1.0)
   (q/no-stroke)
-  (apply q/background (:background palette))
+  (apply q/background (:background @palette-atm))
   ; Create 2000 particles at the start
   ; (render-field w h)
   (q/no-stroke)
@@ -66,7 +70,7 @@
                                 points)))))))
 
 (defn sketch-draw [trails]
-  (apply q/background (:background palette))
+  (apply q/background (:background @palette-atm))
   (doseq [trail trails]
     (apply q/fill (:color trail))
     (q/begin-shape)
@@ -77,8 +81,8 @@
     (q/end-shape :close))
   (when display-field (render-field window-width window-height) (q/no-loop)))
 
-(defn create [{:keys [canvas-id]}]
-  (prn "size" [window-width window-height])
+(defn create [{:keys [canvas-id seed]}]
+  (reset! palette-atm (nth-mod c/palettes seed))
   (q/sketch
     :host canvas-id
     :size [window-width window-height]
@@ -87,7 +91,8 @@
     :update #'sketch-update
     :middleware [middleware/fun-mode]
     :settings (fn []
-                (q/random-seed 432))))
+                (q/random-seed seed)
+                (q/noise-seed seed))))
 
 (defn sketch [opts]
   (create opts))
