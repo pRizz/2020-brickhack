@@ -51,12 +51,12 @@
   (map
     (fn [p]
       (assoc p
-             :x         (c/add-with-rollover (:x p) (* velocity-scalar (:vx p)) w)
-             :y         (c/add-with-rollover (:y p) (* velocity-scalar (:vy p)) h)
-             :length    (+ 1 (:length p))
-             :direction (noise-field-radian (:x p) (:y p))
-             :vx        (c/average (:dx p) (Math/cos (:direction p)))
-             :vy        (c/average (:dy p) (Math/sin (:direction p)))))
+        :x (c/add-with-rollover (:x p) (* velocity-scalar (:vx p)) w)
+        :y (c/add-with-rollover (:y p) (* velocity-scalar (:vy p)) h)
+        :length (+ 1 (:length p))
+        :direction (noise-field-radian (:x p) (:y p))
+        :vx (c/average (:dx p) (Math/cos (:direction p)))
+        :vy (c/average (:dy p) (Math/sin (:direction p)))))
     particles))
 
 (defn sketch-draw [particles]
@@ -72,15 +72,15 @@
 
 (defn create [canvas]
   (q/sketch
-   :host       canvas
-   :size       [w h]
-   :draw       #'sketch-draw
-   :setup      #'sketch-setup
-   :update     #'sketch-update
-   :middleware [middleware/fun-mode]
-   :settings
-               (fn []
-                 (q/random-seed 765)
-                 (q/noise-seed 234))))
+    :host canvas
+    :size [w h]
+    :draw #'sketch-draw
+    :setup #'sketch-setup
+    :update #'sketch-update
+    :middleware [middleware/fun-mode]
+    :settings
+    (fn []
+      (q/random-seed 765)
+      (q/noise-seed 234))))
 
 (defonce sketch (create "sketch"))

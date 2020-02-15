@@ -3,16 +3,15 @@
             [quil.core :as q]
             [quil.middleware :as middleware]))
 
-(def body (.-body js/document))
-(def w (.-clientWidth body))
-(def h (.-clientHeight body))
+(def window-width (.-innerWidth js/window))
+(def window-height (.-innerHeight js/window))
 
 ; This-sketch custom code
 (def palette (rand-nth c/palettes))
 
 (defn trail
   [id]
-  (c/particle-trail id (q/random w) (q/random h) (rand-nth (:colors palette))))
+  (c/particle-trail id (q/random window-width) (q/random window-height) (rand-nth (:colors palette))))
 
 ; settings constants
 (def noise-zoom 0.002)
@@ -49,45 +48,46 @@
   ; (render-field w h)
   (q/no-stroke)
   (sort-by
-   (fn [trail]
-     (:y (first (:points trail))))
-   (map trail (range 0 200))))
+    (fn [trail]
+      (:y (first (:points trail))))
+    (map trail (range 0 200))))
 
 (defn sketch-update [trails]
   (->> trails
        (map
-        (fn [trail]
-          (let [points       (:points trail)
-                velocity     (c/point-sub (first points) (second points))
-                theta        (noise-field-radian (:x (first points)) (:y (first points)))
-                new-velocity {:x (c/average (:x velocity) (Math/cos theta))
-                              :y (c/average (:y velocity) (Math/sin theta))}]
-            (assoc trail :points
-                   (cons (c/point-add (first points) new-velocity)
-                         points)))))))
+         (fn [trail]
+           (let [points (:points trail)
+                 velocity (c/point-sub (first points) (second points))
+                 theta (noise-field-radian (:x (first points)) (:y (first points)))
+                 new-velocity {:x (c/average (:x velocity) (Math/cos theta))
+                               :y (c/average (:y velocity) (Math/sin theta))}]
+             (assoc trail :points
+                          (cons (c/point-add (first points) new-velocity)
+                                points)))))))
 
 (defn sketch-draw [trails]
   (apply q/background (:background palette))
   (doseq [trail trails]
     (apply q/fill (:color trail))
     (q/begin-shape)
-    (q/vertex (:x (first (:points trail))) h)
+    (q/vertex (:x (first (:points trail))) window-height)
     (doseq [point (:points trail)]
       (q/vertex (:x point) (:y point)))
-    (q/vertex (:x (last (:points trail))) h)
+    (q/vertex (:x (last (:points trail))) window-height)
     (q/end-shape :close))
-  (when display-field (render-field w h) (q/no-loop)))
+  (when display-field (render-field window-width window-height) (q/no-loop)))
 
-(defn create [canvas]
+(defn create [{:keys [canvas-id]}]
+  (prn "size" [window-width window-height])
   (q/sketch
-   :host       canvas
-   :size       [w h]
-   :draw       #'sketch-draw
-   :setup      #'sketch-setup
-   :update     #'sketch-update
-   :middleware [middleware/fun-mode]
-   :settings
-               (fn []
-                 (q/random-seed 432))))
+    :host canvas-id
+    :size [window-width window-height]
+    :draw #'sketch-draw
+    :setup #'sketch-setup
+    :update #'sketch-update
+    :middleware [middleware/fun-mode]
+    :settings (fn []
+                (q/random-seed 432))))
 
-(defonce sketch (create "sketch"))
+(defn sketch [opts]
+  (create opts))

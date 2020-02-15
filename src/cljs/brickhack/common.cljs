@@ -102,22 +102,22 @@
   "Subtract the coordinates of two points"
   [point1 point2]
   (assoc point1
-         :x (+ (:x point1) (:x point2))
-         :y (+ (:y point1) (:y point2))))
+    :x (+ (:x point1) (:x point2))
+    :y (+ (:y point1) (:y point2))))
 
 (defn point-sub
   "Subtract the coordinates of two points"
   [point1 point2]
   (assoc point1
-         :x (- (:x point1) (:x point2))
-         :y (- (:y point1) (:y point2))))
+    :x (- (:x point1) (:x point2))
+    :y (- (:y point1) (:y point2))))
 
 (defn point-scale
   "Scale the values of a point by a constant"
   [scalar point]
   (assoc point
-         :x (* scalar (:x point))
-         :y (* scalar (:y point))))
+    :x (* scalar (:x point))
+    :y (* scalar (:y point))))
 
 (defn v-add
   "Add two vectors element-wise"

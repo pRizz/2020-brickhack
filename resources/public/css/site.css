@@ -1,4 +1,4 @@
-.body-container {
+.body-container-legacy {
   font-family: 'Helvetica Neue', Verdana, Helvetica, Arial, sans-serif;
   max-width: 640px;
   margin: 0 auto;
@@ -7,6 +7,13 @@
   font-size: 1.125em;
   color: #333;
   line-height: 1.5em;
+}
+
+.body-container {
+  font-family: 'Helvetica Neue', Verdana, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  font-size: 1.125em;
+  color: #333;
 }
 
 h1, h2, h3 {
