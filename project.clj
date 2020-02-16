@@ -1,5 +1,5 @@
 (defproject generative-art-live "0.1.0-SNAPSHOT"
-  :description "FIXME: write description"
+  :description "Generates generative art on the web"
   :url "http://example.com/FIXME"
   :license
   {:name "Eclipse Public License"
