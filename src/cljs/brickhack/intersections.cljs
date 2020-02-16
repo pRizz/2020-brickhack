@@ -3,14 +3,13 @@
             [quil.core :as q]
             [quil.middleware :as middleware]))
 
-(def body (.-body js/document))
-(def w (.-clientWidth body))
-(def h (.-clientHeight body))
+(def window-width (.-innerWidth js/window))
+(def window-height (.-innerHeight js/window))
 
 ; This-sketch custom code
 (def palette (rand-nth c/palettes))
 
-(defn particle [id] (c/particle id w h palette))
+(defn particle [id] (c/particle id window-width window-height palette))
 
 (def noise-zoom 0.002)
 
@@ -40,8 +39,8 @@
        (map
          (fn [p]
            (assoc p
-             :x (c/add-with-rollover (:x p) (:vx p) w)
-             :y (c/add-with-rollover (:y p) (:vy p) h)
+             :x (c/add-with-rollover (:x p) (:vx p) window-width)
+             :y (c/add-with-rollover (:y p) (:vy p) window-height)
              :length (+ 1 (:length p))
              :color (noise-field-color (:x p) (:y p) (:id p))
              :direction (noise-field-radian (:x p) (:y p))
@@ -58,17 +57,17 @@
     (apply q/fill (:color p))
     (q/ellipse (:x p) (:y p) (:size p) (:size p))))
 
-(defn create [canvas]
+(defn create [{:keys [canvas-id seed]}]
   (q/sketch
-    :host canvas
-    :size [w h]
+    :host canvas-id
+    :size [window-width window-height]
     :draw #'sketch-draw
     :setup #'sketch-setup
     :update #'sketch-update
     :middleware [middleware/fun-mode]
     :settings
     (fn []
-      (q/random-seed 432)
-      (q/noise-seed 432))))
+      (q/random-seed seed)
+      (q/noise-seed seed))))
 
-(defonce sketch (create "sketch"))
+(defn sketch [opts] (create opts))

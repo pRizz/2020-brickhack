@@ -3,9 +3,14 @@
             [quil.core :as q]
             [quil.middleware :as middleware]))
 
-(def body (.-body js/document))
-(def w (.-clientWidth body))
-(def h (.-clientHeight body))
+(def window-width (.-innerWidth js/window))
+(def window-height (.-innerHeight js/window))
+
+(defn nth-mod [coll n]
+  (nth coll (mod n (count coll))))
+
+(defn q-rand-nth [coll]
+  (nth coll (q/random (count coll))))
 
 ; This-sketch custom code
 (def palette (rand-nth c/palettes))
@@ -19,9 +24,9 @@
    :size      2
    :direction 0
    :length    0
-   :x         (q/random w)
-   :y         (q/random h)
-   :color     (rand-nth (:colors palette))})
+   :x         (q/random window-width)
+   :y         (q/random window-height)
+   :color     (nth-mod (:colors palette) (q/random (count palette)))}) ; FIXME q-rand-nth
 
 
 (def noise-zoom 0.005)
@@ -68,8 +73,8 @@
   (map
     (fn [p]
       (assoc p
-        :x (c/add-with-rollover (:x p) (:vx p) w)
-        :y (c/add-with-rollover (:y p) (:vy p) h)
+        :x (c/add-with-rollover (:x p) (:vx p) window-width)
+        :y (c/add-with-rollover (:y p) (:vy p) window-height)
         :length (+ 1 (:length p))
         :direction (noise-field-radian (:x p) (:y p))
         :vx (c/average (:dx p) (Math/cos (:direction p)))
@@ -85,7 +90,7 @@
 (defn create [canvas]
   (q/sketch
     :host canvas
-    :size [w h]
+    :size [window-width window-height]
     :draw #'sketch-draw
     :setup #'sketch-setup
     :update #'sketch-update

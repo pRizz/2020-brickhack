@@ -5,7 +5,11 @@
     [reitit.frontend :as reitit]
     [clerk.core :as clerk]
     [accountant.core :as accountant]
-    [brickhack.ribbons :as ribbons]))
+    [brickhack.ribbons :as ribbons]
+    [brickhack.proper-ribbons :as proper-ribbons]
+    [brickhack.intersections :as intersections]
+    [brickhack.trails :as trails]
+    [cljs-material-ui.core :as mui]))
 
 ;; -------------------------
 ;; Routes
@@ -75,15 +79,42 @@
 ;; -------------------------
 ;; Page mounting component
 
-(defn- toolbar-element []
-  [:div {:style {:position         "absolute"
-                 :top              20
-                 :right            20
-                 :padding          20
-                 :color            "#ddd"
-                 :background-color "black"
-                 :borderRadius     8}}
-   "testing"])
+(def generators
+  [{:sketch-fn ribbons/sketch
+    :label     "Ribbons"}
+   {:sketch-fn intersections/sketch
+    :label     "Intersections"}
+   {:sketch-fn proper-ribbons/sketch
+    :label     "Proper Ribbons"}])
+
+(defn- toolbar-element [{:keys [on-generator-change on-generator-reset]}]
+  (let [selected-generator-index-atom (reagent/atom 0)
+        selected-generator-atom (reagent/atom (nth generators 0))]
+    (fn [{:keys [on-generator-change on-generator-reset]}]
+      [:div {:style {:position         "absolute"
+                     :top              20
+                     :right            20
+                     :padding          20
+                     :color            "#ddd"
+                     :background-color "gray"
+                     :borderRadius     8}}
+       [mui/button {:variant  "contained"
+                    :color    "primary"
+                    :on-click on-generator-reset
+                    :style    {}} "Restart"]
+       [:div {:style {:height "1em"}}]
+       [:div
+        [mui/form-control {}
+         (mui/input-label {} "Generator")
+         (mui/select {:value     @selected-generator-index-atom
+                      :on-change (fn [e]
+                                   (reset! selected-generator-index-atom (nth generators (-> e .-target .-value)))
+                                   (let [generator (nth generators (-> e .-target .-value))]
+                                     (reset! selected-generator-atom generator)
+                                     (on-generator-change generator)))}
+                     (mui/menu-item {:value 0} (:label (nth generators 0))) ; FIXME: use (map)
+                     (mui/menu-item {:value 1} (:label (nth generators 1)))
+                     (mui/menu-item {:value 2} (:label (nth generators 2))))]]])))
 
 (defn- sketch-element []
   [:div#sketch {:style {:position         "absolute"
@@ -95,13 +126,27 @@
 
 (defn current-page []
   (let [seed 1234
-        sketch-instance (js/setTimeout #(ribbons/sketch {:canvas-id "sketch"
-                                                         :seed      seed})
-                                       500)])               ; TODO: find a cleaner way to wait for sketch div to render
-  (fn []
-    [:<>
-     [sketch-element]
-     [toolbar-element]]))
+        current-generator-atm (reagent/atom (nth generators 0))
+        on-generator-reset (fn []
+                             (js/setTimeout #((:sketch-fn @current-generator-atm) {:canvas-id "sketch"
+                                                                                   :seed      seed})
+                                            1))
+        initial-sketch-instance (js/setTimeout #((:sketch-fn @current-generator-atm) {:canvas-id "sketch"
+                                                                                      :seed      seed})
+                                               2500)
+        on-generator-change (fn [generator]
+                              (reset! current-generator-atm generator)
+                              (on-generator-reset))]
+    (fn []
+      [:<>
+       [sketch-element]
+       [toolbar-element {:on-generator-reset  (fn []
+                                                (on-generator-reset)
+                                                (prn "reset gen"))
+                         :on-generator-change (fn [generator]
+                                                (on-generator-change generator)
+                                                (prn "new val" generator))}]])))
+
 
 ;; -------------------------
 ;; Initialize app

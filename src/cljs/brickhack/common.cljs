@@ -1,6 +1,9 @@
 (ns brickhack.common
   (:require [quil.core :as q]))
 
+(defn nth-mod [coll n]
+  (nth coll (mod n (count coll))))
+
 (defn coords-with-radian
   [x y r rScalar]
   [(+ x (* rScalar (Math/cos r)))
@@ -68,6 +71,7 @@
    :vx        0
    :vy        0
    :size      2
+   ;:size      20
    :direction 0
    :length    0
    :x         (q/random width)
@@ -78,7 +82,8 @@
   "Create a string type object"
   [id x y color]
   {:id     id
-   :size   2
+   ;:size   2
+   :size   10
    :points (list {:x x :y y :color color}
                  {:x x :y y :color color})
    :color  color})

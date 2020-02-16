@@ -3,16 +3,15 @@
             [quil.core :as q]
             [quil.middleware :as middleware]))
 
-(def body (.-body js/document))
-(def w (.-clientWidth body))
-(def h (.-clientHeight body))
+(def window-width (.-innerWidth js/window))
+(def window-height (.-innerHeight js/window))
 
 ; This-sketch custom code
 (def palette (rand-nth c/palettes))
 
 (defn trail
   [id]
-  (c/particle-trail id (q/random w) (q/random h) (rand-nth (:colors palette))))
+  (c/particle-trail id (q/random window-width) (q/random window-height) (c/nth-mod (:colors palette) (q/random (count palette)))))
 
 (def noise-zoom 0.002)
 
@@ -83,12 +82,12 @@
           val)
         ; Hopefully this works
         (doseq [point-pair val]
-          (polygon-to-baseboard (first point-pair) (second point-pair) h))))
+          (polygon-to-baseboard (first point-pair) (second point-pair) window-height))))
 
-(defn create [canvas]
+(defn create [{:keys [canvas-id seed]}]
   (q/sketch
-    :host canvas
-    :size [w h]
+    :host canvas-id
+    :size [window-width window-height]
     :draw #'sketch-draw
     :setup #'sketch-setup
     :update #'sketch-update
@@ -98,4 +97,4 @@
       (q/random-seed 432)
       (q/noise-seed 432))))
 
-(defonce sketch (create "sketch"))
+(defn sketch [opts] (create opts))
