@@ -10,6 +10,8 @@
     [brickhack.proper-ribbons :as proper-ribbons]
     [brickhack.intersections :as intersections]
     [brickhack.intersections-dual :as intersections-dual]
+    [brickhack.intersections-web :as intersections-web]
+    [brickhack.intersections-flannel :as intersections-flannel]
     [brickhack.trails :as trails]
     [cljs-material-ui.core :as mui]))
 
@@ -89,7 +91,11 @@
 ;(s/def ::generators (s/coll-of #(s/valid? ::generator %)))
 
 (def generators
-  [{:sketch-fn intersections-dual/sketch
+  [{:sketch-fn intersections-flannel/sketch
+    :label     "Intersections Flannel"}
+   {:sketch-fn intersections-web/sketch
+    :label     "Intersections Web"}
+   {:sketch-fn intersections-dual/sketch
     :label     "Intersections Dual"}
    {:sketch-fn ribbons/sketch
     :label     "Ribbons"}
