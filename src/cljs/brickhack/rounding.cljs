@@ -10,7 +10,7 @@
 ; This-sketch custom code
 (def palette (rand-nth c/palettes))
 
-(defn particle [id] (c/particle id w h palette))
+(defn particle [id] (c/particle-generator id w h palette))
 
 (def noise-zoom 0.005)
 

@@ -1,5 +1,6 @@
 (ns generative-art-live.core
   (:require
+    [clojure.spec.alpha :as s]
     [reagent.core :as reagent :refer [atom]]
     [reagent.session :as session]
     [reitit.frontend :as reitit]
@@ -8,6 +9,7 @@
     [brickhack.ribbons :as ribbons]
     [brickhack.proper-ribbons :as proper-ribbons]
     [brickhack.intersections :as intersections]
+    [brickhack.intersections-dual :as intersections-dual]
     [brickhack.trails :as trails]
     [cljs-material-ui.core :as mui]))
 
@@ -79,8 +81,17 @@
 ;; -------------------------
 ;; Page mounting component
 
+; add a spec for this; maye defrecord or core.typed
+
+;(s/def ::sketch-fn fn?)
+;(s/def ::label string?)
+;(s/def ::generator (s/keys :req-un [::sketch-fn ::label]))
+;(s/def ::generators (s/coll-of #(s/valid? ::generator %)))
+
 (def generators
-  [{:sketch-fn ribbons/sketch
+  [{:sketch-fn intersections-dual/sketch
+    :label     "Intersections Dual"}
+   {:sketch-fn ribbons/sketch
     :label     "Ribbons"}
    {:sketch-fn intersections/sketch
     :label     "Intersections"}

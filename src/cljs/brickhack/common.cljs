@@ -1,6 +1,9 @@
 (ns brickhack.common
   (:require [quil.core :as q]))
 
+(def window-width (.-innerWidth js/window))
+(def window-height (.-innerHeight js/window))
+
 (defn nth-mod [coll n]
   (nth coll (mod n (count coll))))
 
@@ -64,7 +67,7 @@
                  [1 85 70]
                  [1 25 100]]}])
 
-(defn particle
+(defn particle-generator
   "Create a particle obj"
   [id width height palette]
   {:id        id
