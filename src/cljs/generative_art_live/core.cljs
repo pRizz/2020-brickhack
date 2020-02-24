@@ -8,6 +8,7 @@
     [accountant.core :as accountant]
     [brickhack.ribbons :as ribbons]
     [brickhack.proper-ribbons :as proper-ribbons]
+    [brickhack.paint :as paint]
     [brickhack.intersections :as intersections]
     [brickhack.intersections-dual :as intersections-dual]
     [brickhack.intersections-web :as intersections-web]
@@ -91,7 +92,9 @@
 ;(s/def ::generators (s/coll-of #(s/valid? ::generator %)))
 
 (def generators
-  [{:sketch-fn intersections-flannel/sketch
+  [{:sketch-fn paint/sketch
+    :label     "Paint"}
+   {:sketch-fn intersections-flannel/sketch
     :label     "Intersections Flannel"}
    {:sketch-fn intersections-web/sketch
     :label     "Intersections Web"}
@@ -129,9 +132,9 @@
                                    (let [generator (nth generators (-> e .-target .-value))]
                                      (reset! selected-generator-atom generator)
                                      (on-generator-change generator)))}
-                     (mui/menu-item {:value 0} (:label (nth generators 0))) ; FIXME: use (map)
-                     (mui/menu-item {:value 1} (:label (nth generators 1)))
-                     (mui/menu-item {:value 2} (:label (nth generators 2))))]]])))
+                     (map-indexed (fn [index generator]
+                                    (mui/menu-item {:value index} (:label generator)))
+                                  generators))]]])))
 
 (defn- sketch-element []
   [:div#sketch {:style {:position         "absolute"
